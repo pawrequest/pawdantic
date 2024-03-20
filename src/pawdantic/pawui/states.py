@@ -3,8 +3,12 @@ import typing as _t
 
 import pydantic as _p
 
+from . import types_
+
 
 class BaseUIState(_p.BaseModel):
+    alert_dict: types_.AlertDict | None = None  # msg -> type
+
     def update_get_query64(self, **kwargs) -> dict[str, str]:
         """returns {'update': updated jsonb64}"""
         update = self.model_copy(update=kwargs)

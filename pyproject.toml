@@ -15,6 +15,9 @@ requires-python = ">= 3.8"
 ui = [
     'fastui'
 ]
+sql = [
+    'sqlmodel'
+]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
