@@ -28,7 +28,7 @@ def object_strs_texts(
     args:
     objs: pydantic models
     with_keys: 'NO', 'YES', 'ONLY' - whether to include values, keys and values, or only keys
-    class_name: optional bootstrap class name
+    page_class_name: optional bootstrap class name
     title: optional title for the list of text components
 
     returns:
@@ -113,7 +113,7 @@ def wrap_divs(
     Div.wrap(
             c.Text(text='hello'),
             c.Text(text='world'),
-            class_name=styles.COL_STYLE,
+            page_class_name=styles.COL_STYLE,
             inner_class_name=styles.ROW_STYLE,
         )
     returns a single column with each component in a row
@@ -191,11 +191,10 @@ async def page_w_alerts(
         title: str = '',
         navbar=None,
         footer=None,
-        class_name=None,
-        alert_dict: types_.AlertDict | None = None  # msg -> type
-
+        page_class_name=None,
+        alert_dict: types_.AlertDict | None = None,
+        container_class_name=styles.CONTAINER_STYLE
 ) -> list['c.AnyComponent']:
-    al_rows = await get_alert_rows(alert_dict)
     return [
         c.PageTitle(text=f'PawRequest dev - {title}' if title else ''),
         *((navbar,) if navbar else ()),
@@ -203,13 +202,13 @@ async def page_w_alerts(
             components=[
                 c.Div(
                     components=[
-                        *al_rows,
+                        *await get_alert_rows(alert_dict),
                         *components,
                     ],
-                    class_name=styles.CONTAINER_STYLE
+                    class_name=container_class_name if container_class_name else styles.CONTAINER_STYLE,
                 )
             ],
-            class_name=f'{styles.PAGE_STYLE} {class_name}' if class_name else styles.PAGE_STYLE,
+            class_name=page_class_name if page_class_name else styles.PAGE_STYLE,
         ),
         *((footer,) if footer else ()),
     ]
