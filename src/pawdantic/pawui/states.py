@@ -7,7 +7,7 @@ from . import pawui_types
 
 
 class BaseUIState(_p.BaseModel):
-    alert_dict: pawui_types.AlertDict | None = None  # msg -> type
+    alert_dict: pawui_types.AlertDict | None = None  # {msg : type}
 
     def update_get_query64(self, **kwargs) -> dict[str, str]:
         """returns {'update': updated jsonb64}"""
