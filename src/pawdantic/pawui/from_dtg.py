@@ -8,7 +8,7 @@ from loguru import logger
 
 from DecodeTheBot.dtg_bot import DB_MODELS
 from DecodeTheBot.ui.dtg_styles import HEAD, SUB_LIST, TITLE_COL, PLAY_COL
-from fastuipr import builders, styles
+from pawdantic.pawui import builders, styles
 from suppawt import get_set, convert
 
 
