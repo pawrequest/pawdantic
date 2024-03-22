@@ -87,3 +87,18 @@ VALID_POSTCODE = _t.Annotated[
     _p.BeforeValidator(lambda s: s.strip().upper()),
     _p.Field(..., description='A valid UK postcode'),
 ]
+
+
+def multi_model_dump(*models: _p.BaseModel):
+    return {
+        k: v
+        for mod in list(models)
+        for k, v in mod.model_dump(exclude_none=True).items()
+    }
+
+
+def get_initial_f_dict(*dicts: dict):
+    dicts = list(dicts)
+    return {
+        k: v for d in dicts for k, v in d.items()
+    }
