@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-from suppawt.backup_ps.pruner import Pruner
+from suppawt.backupaw import Pruner
 from .sqlmodel_backup import SQLModelBackup
 
 
