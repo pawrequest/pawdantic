@@ -3,7 +3,7 @@ import typing as _t
 import pydantic as _p
 from fastui import class_name as _class_name, components as c, events as e
 
-from . import styles, types_
+from . import pawui_types, styles
 
 
 def back_link(text: str = 'Back', class_name=None) -> c.Link:
@@ -233,7 +233,7 @@ async def page_w_alerts(
         navbar=None,
         footer=None,
         page_class_name=None,
-        alert_dict: types_.AlertDict | None = None,
+        alert_dict: pawui_types.AlertDict | None = None,
         container_class_name=styles.CONTAINER_STYLE
 ) -> list['c.AnyComponent']:
     return [
@@ -255,9 +255,11 @@ async def page_w_alerts(
     ]
 
 
-async def get_alert_rows(alert_dict: types_.AlertDict) -> list[c.Div]:
-    if not alert_dict:
-        return []
-    alert_txts = [c.Text(text=_) for _ in alert_dict.keys()]
-    alert_rows = list_of_divs(components=alert_txts, class_name=styles.ALERT_STYLE)
-    return alert_rows
+async def get_alert_rows(alert_dict: pawui_types.AlertDict) -> list[c.Div]:
+    return [
+        c.Div(
+            components=[c.Text(text=msg)],
+            class_name=styles.get_alert_style(level)
+        )
+        for msg, level in alert_dict.items()
+    ] if alert_dict else []
