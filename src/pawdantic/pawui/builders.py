@@ -37,10 +37,51 @@ def object_strs_texts(
     txts = []
     if title:
         txts.append(c.Heading(text=title, level=title_level))
+
     for k, v in obj.model_dump().items():
         if not v:
             continue
-        if isinstance(v, str):
+
+        v = str(v)
+        match with_keys:
+            case 'NO':
+                txt_str = v
+            case 'YES':
+                txt_str = f'{k} - {v}'
+            case 'ONLY':
+                txt_str = k
+            case _:
+                raise ValueError(f'with_keys: {with_keys} not valid')
+        txts.append(c.Text(text=txt_str))
+    return txts
+
+
+def dict_strs_texts(
+        indict: dict,
+        with_keys: _t.Literal['NO', 'YES', 'ONLY'] = 'NO',
+        title: str = None,
+        title_level: int = 3,
+) -> list[c.Text]:
+    txts = []
+    if title:
+        txts.append(c.Heading(text=title, level=title_level))
+
+    for k, v in indict.items():
+        if not v:
+            continue
+
+        if isinstance(v, dict):
+            txts.extend(dict_strs_texts(v, with_keys=with_keys, title=k, title_level=title_level))
+
+        elif isinstance(v, list):
+            txts.extend(
+                [
+                    c.Text(text=i) for i in v
+                ]
+            )
+
+        else:
+            v = str(v)
             match with_keys:
                 case 'NO':
                     txt_str = v
