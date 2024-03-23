@@ -8,6 +8,7 @@ from loguru import logger
 from pydantic import BaseModel
 from sqlmodel import Session, SQLModel, select
 
+import suppawt.convert
 from suppawt import get_set, misc, types as ps_types
 
 
@@ -25,7 +26,7 @@ def assign_rel(instance: SQLModel, model: type[SQLModel], matches: list[SQLModel
         logger.warning(f'Instance is same type as model: {instance.__class__.__name__}')
         return
     try:
-        to_extend = getattr(instance, get_set.snake_name_s(model))
+        to_extend = getattr(instance, suppawt.convert.snake_name_s(model))
         to_extend.extend(matches)
     except Exception as e:
         logger.error(f'Error assigning {model.__name__} to {instance.__class__.__name__} - {e}')
@@ -89,7 +90,7 @@ async def all_matches(
     :param models: models to check
     :return: dict of matches
     """
-    res = {get_set.snake_name_s(model): db_obj_matches(session, instance, model) for model in models}
+    res = {suppawt.convert.snake_name_s(model): db_obj_matches(session, instance, model) for model in models}
     return res
 
 
@@ -100,7 +101,7 @@ def model_map_(models: Sequence[SQLModel]) -> dict[str, SQLModel]:
     :param models: models to map
     :return: dict of model names to models
     """
-    return {get_set.snake_name(_): _ for _ in models}
+    return {suppawt.convert.snake_name(_): _ for _ in models}
 
 
 @lru_cache
@@ -112,7 +113,7 @@ def get_other_table_names(obj, data_models) -> list[str]:
     :param data_models: models to check
     :return: list of table names
     """
-    return [get_set.snake_name_s(_) for _ in data_models if not isinstance(obj, _)]
+    return [suppawt.convert.snake_name_s(_) for _ in data_models if not isinstance(obj, _)]
 
 
 @lru_cache
@@ -123,7 +124,7 @@ def get_table_names(data_models) -> list[str]:
     :param data_models: models to check
     :return: list of table names
     """
-    return [get_set.snake_name_s(_) for _ in data_models]
+    return [suppawt.convert.snake_name_s(_) for _ in data_models]
 
 
 class GenericJSONType(sqa.TypeDecorator):

@@ -10,7 +10,7 @@ from pathlib import Path
 from sqlmodel import SQLModel, Session, select
 from loguru import logger
 
-from suppawt.get_set import snake_name
+from suppawt.convert import snake_name
 
 
 class SQLModelBackup:

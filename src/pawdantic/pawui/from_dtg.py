@@ -6,6 +6,7 @@ from fastui import components as c, events
 from fastui.events import GoToEvent
 from loguru import logger
 
+import suppawt.convert
 from DecodeTheBot.dtg_bot import DB_MODELS
 from DecodeTheBot.ui.dtg_styles import HEAD, SUB_LIST, TITLE_COL, PLAY_COL
 from pawdantic.pawui import builders, styles
@@ -22,7 +23,7 @@ def objects_ui_with(objects: Sequence) -> c.Div:
         headers_and_rows = [_object_ui_with_related(_) for _ in objects]
 
         head_names = [_[0] for _ in headers_and_rows[0]]
-        head_names = [get_set.title_from_snake(_) for _ in head_names]
+        head_names = [suppawt.convert.title_from_snake(_) for _ in head_names]
         headers = get_headers(head_names)
 
         rows = [
