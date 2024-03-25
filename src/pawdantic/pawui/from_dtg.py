@@ -7,7 +7,7 @@ from fastui.events import GoToEvent
 from loguru import logger
 
 import suppawt.convert
-from DecodeTheBot.dtg_bot import DB_MODELS
+from DecodeTheBot.dtg_types import DB_MODELS
 from DecodeTheBot.ui.dtg_styles import HEAD, SUB_LIST, TITLE_COL, PLAY_COL
 from pawdantic.pawui import builders, styles
 from suppawt import get_set, convert
