@@ -89,7 +89,7 @@ VALID_POSTCODE = _t.Annotated[
 ]
 
 
-def multi_model_dump(*models: _p.BaseModel):
+def multi_model_dump(*models: _p.BaseModel) -> dict[str, str]:
     return {
         k: v
         for mod in list(models)

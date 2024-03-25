@@ -61,7 +61,7 @@ def dict_strs_texts(
         with_keys: _t.Literal['NO', 'YES', 'ONLY'] = 'NO',
         title: str = None,
         title_level: int = 3,
-) -> list[c.Text]:
+) -> list[c.Heading | c.Text]:
     txts = []
     if title:
         txts.append(c.Heading(text=title, level=title_level))
@@ -96,6 +96,35 @@ def dict_strs_texts(
 
 
 def default_page(
+        components: list[c.AnyComponent],
+        title: str = '',
+        navbar=None,
+        footer=None,
+        header_class: _class_name.ClassNameField = None,
+        class_name: _class_name.ClassNameField = None,
+) -> list['c.AnyComponent']:
+    """"
+    return a list of components wrapped in a page with title, navbar and footer
+
+    add browser-tab Title and header component based on title and header_class
+    """
+    # components = list(components)
+    comps = [
+        *((c.Heading(text=title, class_name=header_class),) if title else ()),
+        *components,
+    ]
+    return [
+        c.PageTitle(text=title if title else ''),
+        *((navbar,) if navbar else ()),
+        c.Page(
+            components=comps,
+            class_name=class_name,
+        ),
+        *((footer,) if footer else ()),
+    ]
+
+
+async def default_pageasync(
         components: list[c.AnyComponent],
         title: str = '',
         navbar=None,
