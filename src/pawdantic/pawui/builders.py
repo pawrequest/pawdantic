@@ -263,7 +263,7 @@ async def page_w_alerts(
         footer=None,
         page_class_name=None,
         alert_dict: pawui_types.AlertDict | None = None,
-        container_class_name=styles.CONTAINER_STYLE
+        container_class_name=None
 ) -> list['c.AnyComponent']:
     return [
         c.PageTitle(text=f'PawRequest dev - {title}' if title else ''),

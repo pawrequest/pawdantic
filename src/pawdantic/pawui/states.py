@@ -29,7 +29,7 @@ class BaseUIState(_p.BaseModel):
         except _p.ValidationError as e:
             raise ValueError(f'{state_64=} is not a valid base64 encoded {cls.__name__} - {e}')
 
-    def update_dump_64(self, **kwargs) -> str:
+    def update_dump_64_dict(self, **kwargs) -> str:
         updated = self.model_copy(update=kwargs)
         return updated.model_dump_64()
 
@@ -39,5 +39,5 @@ class BaseUIState(_p.BaseModel):
 
     def get_updated(self, updater: 'BaseUIState') -> _t.Self:
         """return a new BookingStateUpdate with the values of other merged into self."""
-        up_dict = {update: getattr(updater, update) for update in updater.model_fields_set}
+        up_dict = updater.model_dump(exclude_none=True)
         return self.model_validate(self.model_copy(update=up_dict))
