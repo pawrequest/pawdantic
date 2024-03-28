@@ -7,6 +7,9 @@ from . import pawui_types
 
 
 class BaseUIState(_p.BaseModel):
+    # model_config = _p.ConfigDict(
+    #     use_enum_values=True,
+    # )
     alert_dict: pawui_types.AlertDict | None = None  # {msg : type}
 
     def update_get_query64(self, **kwargs) -> dict[str, str]:
