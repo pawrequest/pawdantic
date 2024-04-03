@@ -5,7 +5,7 @@ from pawdantic.pawui import pawui_types
 
 ROW_STYLE: _class_name.ClassName = 'row'
 COL_STYLE: _class_name.ClassName = 'col'
-CONTAINER_STYLE: _class_name.ClassName = 'row w-75 mx-auto'
+CONTAINER_STYLE: _class_name.ClassName = 'row w-90 mx-auto mt-5'
 PAGE_STYLE: _class_name.ClassName = 'container'
 ALERT_STYLE: _class_name.ClassName = 'alert alert-warning'
 SHIP_BUTTON: _class_name.ClassName = 'row align-items-center'

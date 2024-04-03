@@ -270,6 +270,7 @@ async def page_w_alerts(
         *((navbar,) if navbar else ()),
         c.Page(
             components=[
+
                 c.Div(
                     components=[
                         *await get_alert_rows(alert_dict),
