@@ -60,7 +60,7 @@ def dict_strs_texts(
         indict: dict,
         with_keys: _t.Literal['NO', 'YES', 'ONLY'] = 'NO',
         title: str = None,
-        title_level: int = 3,
+        title_level: _t.Literal[1, 2, 3, 4, 5, 6] = 3,
 ) -> list[c.Heading | c.Text]:
     txts = []
     if title:
