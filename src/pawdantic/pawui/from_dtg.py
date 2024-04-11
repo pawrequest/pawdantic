@@ -10,7 +10,7 @@ import suppawt.convert
 from DecodeTheBot.dtg_types import DB_MODELS
 from DecodeTheBot.ui.dtg_styles import HEAD, SUB_LIST, TITLE_COL, PLAY_COL
 from pawdantic.pawui import builders, styles
-from suppawt import get_set, convert
+from suppawt import get_values, convert
 
 
 def get_headers(header_names: list) -> c.Div:

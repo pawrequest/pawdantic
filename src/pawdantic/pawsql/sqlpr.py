@@ -9,7 +9,9 @@ from pydantic import BaseModel
 from sqlmodel import Session, SQLModel, select
 
 import suppawt.convert
-from suppawt import get_set, misc, types as ps_types
+import suppawt.get_values
+from suppawt import get_values, misc, compare
+from suppawt import paw_types as ps_types
 
 
 def assign_rel(instance: SQLModel, model: type[SQLModel], matches: list[SQLModel]) -> None:
@@ -56,7 +58,7 @@ def obj_in_session(session, obj: ps_types.HasGetHash) -> bool:
     :return: True if object is in session, False otherwise
     """
     # todo hash in db
-    return get_set.get_hash(obj) in [get_set.get_hash(_) for _ in session.exec(select(type(obj))).all()]
+    return get_values.get_hash(obj) in [get_values.get_hash(_) for _ in session.exec(select(type(obj))).all()]
 
 
 def db_obj_matches(session: Session, obj: ps_types.HasTitleOrName, model: type(SQLModel)) -> list[SQLModel]:
@@ -71,11 +73,11 @@ def db_obj_matches(session: Session, obj: ps_types.HasTitleOrName, model: type(S
     if isinstance(obj, model):
         return []
     db_objs = session.exec(select(model)).all()
-    identifier = get_set.title_or_name_val(obj)
-    obj_var = get_set.title_or_name_var(model)
+    identifier = get_values.title_or_name_val(obj)
+    obj_var = get_values.title_or_name_var(model)
 
     if matched_tag_models := [_ for _ in db_objs if misc.one_in_other(_, obj_var, identifier)]:
-        logger.debug(f'Found {misc.matches_str(matched_tag_models, model)} for {misc.instance_log_str(obj)}')
+        logger.debug(f'Found {matches_str(matched_tag_models, model)} for {suppawt.get_values.instance_log_str(obj)}')
     return matched_tag_models
 
 
