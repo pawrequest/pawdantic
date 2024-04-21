@@ -61,8 +61,8 @@ def object_col_one(obj) -> Union[c.Div, c.Link]:
     return builders.wrap_divs(
         components=[
             c.Link(
-                components=[c.Text(text=get_set.title_or_name_val(obj))],
-                on_click=events.GoToEvent(url=get_set.slug_or_none(obj)),
+                components=[c.Text(text=get_values.title_or_name_val(obj))],
+                on_click=events.GoToEvent(url=get_values.slug_or_none(obj)),
             )
         ],
         class_name=styles.COL_STYLE
@@ -88,14 +88,14 @@ def _object_ui_with_related(obj) -> list[tuple[str, c.Div]]:
         for typ in get_related_typs(obj)
     ]
 
-    ident_name = get_set.title_or_name_var(obj)
+    ident_name = get_values.title_or_name_var(obj)
     out_list.insert(1, (ident_name, title_column(obj)))
     return out_list
 
 
 def title_column(obj):
-    url = get_set.slug_or_none(obj)
-    title = get_set.title_or_name_val(obj)
+    url = get_values.slug_or_none(obj)
+    title = get_values.title_or_name_val(obj)
     return builders.wrap_divs(
         class_name=TITLE_COL,
         components=[
