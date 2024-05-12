@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Sequence, Sized
 from functools import lru_cache
 
 import sqlalchemy as sqa
 from loguru import logger
 from pydantic import BaseModel
-from sqlmodel import Session, SQLModel, select
-
-import suppawt.convert
-import suppawt.get_values
-from suppawt import get_values, misc, compare
-from suppawt import paw_types as ps_types
+from pydantic.alias_generators import to_snake
+from sqlmodel import SQLModel
 
 
 def assign_rel(instance: SQLModel, model: type[SQLModel], matches: list[SQLModel]) -> None:
@@ -28,10 +24,14 @@ def assign_rel(instance: SQLModel, model: type[SQLModel], matches: list[SQLModel
         logger.warning(f'Instance is same type as model: {instance.__class__.__name__}')
         return
     try:
-        to_extend = getattr(instance, suppawt.convert.snake_name_s(model))
+        to_extend = related_from_snakenames(instance, model)
         to_extend.extend(matches)
     except Exception as e:
         logger.error(f'Error assigning {model.__name__} to {instance.__class__.__name__} - {e}')
+
+
+def related_from_snakenames(instance, model):
+    return getattr(instance, f'{to_snake(model.__name__)}s')
 
 
 async def assign_all(instance: SQLModel, matches_d: dict[str, list[SQLModel]]) -> None:
@@ -49,51 +49,14 @@ async def assign_all(instance: SQLModel, matches_d: dict[str, list[SQLModel]]) -
         assign_rel(instance, model, matches)
 
 
-def obj_in_session(session, obj: ps_types.HasGetHash) -> bool:
+def matches_str(matches: Sized, model: type):
     """
-    Check if an object is in a session
-
-    :param session: session to check
-    :param obj: object to check
-    :return: True if object is in session, False otherwise
+    :param matches: A list of model instances.
+    :param model: The model class to describe.
+    :return: A string describing the number and type of model matches.
     """
-    # todo hash in db
-    return get_values.get_hash(obj) in [get_values.get_hash(_) for _ in session.exec(select(type(obj))).all()]
-
-
-def db_obj_matches(session: Session, obj: ps_types.HasTitleOrName, model: type(SQLModel)) -> list[SQLModel]:
-    """
-    Get all objects in a session that match an object
-
-    :param session: session to check
-    :param obj: object to check
-    :param model: model to check
-    :return: list of objects that match
-    """
-    if isinstance(obj, model):
-        return []
-    db_objs = session.exec(select(model)).all()
-    identifier = get_values.title_or_name_val(obj)
-    obj_var = get_values.title_or_name_var(model)
-
-    if matched_tag_models := [_ for _ in db_objs if misc.one_in_other(_, obj_var, identifier)]:
-        logger.debug(f'Found {matches_str(matched_tag_models, model)} for {suppawt.get_values.instance_log_str(obj)}')
-    return matched_tag_models
-
-
-async def all_matches(
-    session: Session, instance: ps_types.HasTitleOrName, models: Sequence[SQLModel]
-) -> dict[str, list[SQLModel]]:
-    """
-    Get all matches for an object in a session
-
-    :param session: session to check
-    :param instance: object to check
-    :param models: models to check
-    :return: dict of matches
-    """
-    res = {suppawt.convert.snake_name_s(model): db_obj_matches(session, instance, model) for model in models}
-    return res
+    matches = len(matches)
+    return f"{matches} '{model.__name__}' {'match' if matches == 1 else 'matches'}"
 
 
 def model_map_(models: Sequence[SQLModel]) -> dict[str, SQLModel]:
@@ -103,7 +66,7 @@ def model_map_(models: Sequence[SQLModel]) -> dict[str, SQLModel]:
     :param models: models to map
     :return: dict of model names to models
     """
-    return {suppawt.convert.snake_name(_): _ for _ in models}
+    return {f'{to_snake(_.__name__)}s': _ for _ in models}
 
 
 @lru_cache
@@ -115,18 +78,7 @@ def get_other_table_names(obj, data_models) -> list[str]:
     :param data_models: models to check
     :return: list of table names
     """
-    return [suppawt.convert.snake_name_s(_) for _ in data_models if not isinstance(obj, _)]
-
-
-@lru_cache
-def get_table_names(data_models) -> list[str]:
-    """
-    Get the names of all tables
-
-    :param data_models: models to check
-    :return: list of table names
-    """
-    return [suppawt.convert.snake_name_s(_) for _ in data_models]
+    return [related_from_snakenames(obj, _) for _ in data_models if not isinstance(obj, _)]
 
 
 class GenericJSONType(sqa.TypeDecorator):
