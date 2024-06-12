@@ -2,7 +2,7 @@ import sqlalchemy
 from pydantic import BaseModel
 
 
-class GenericJSONType(sqlalchemy.TypeDecorator):
+class JSONColumn(sqlalchemy.TypeDecorator):
     impl = sqlalchemy.JSON
 
     def __init__(self, model_class: type[BaseModel], *args, **kwargs):
