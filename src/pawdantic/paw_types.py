@@ -36,6 +36,16 @@ def truncate_before(maxlength) -> _p.BeforeValidator:
     return _p.BeforeValidator(_truncate)
 
 
+def truncate_after(maxlength) -> _p.AfterValidator:
+    def _truncate(v):
+        if v:
+            if len(v) > maxlength:
+                return v[:maxlength]
+        return v
+
+    return _p.AfterValidator(_truncate)
+
+
 def truncated_ident_str_type(max_length: int):
     return _ty.Annotated[
         IdentStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
@@ -58,10 +68,11 @@ def truncated_printable_str_type(max_length: int):
 
 def optional_truncated_printable_str_type(max_length: int):
     return _ty.Annotated[
-        PrintableStr, _p.StringConstraints(max_length=max_length), truncate_before(
-            max_length
-        ), _p.Field(
-            ''
+        PrintableStr,
+        _p.StringConstraints(max_length=max_length),
+        truncate_before(max_length),
+        _p.Field(
+            default=None,
         )
     ]
 
