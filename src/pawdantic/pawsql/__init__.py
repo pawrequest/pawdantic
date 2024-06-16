@@ -1,3 +1,5 @@
+from datetime import date
+
 import sqlalchemy
 from pydantic import BaseModel
 from sqlmodel import Column, Field
@@ -29,6 +31,9 @@ class PydanticJSONColumn(sqlalchemy.TypeDecorator):
             )
         elif isinstance(value, BaseModel):
             return value.model_dump_json(round_trip=True)
+        # elif isinstance(value, date):
+        #     logger.debug(f'Processing date {value}')
+        #     return value.isoformat()
 
     def process_result_value(self, value: JSONTypes, dialect) -> JSONTypesPydantic:
         if value is None:
@@ -52,3 +57,7 @@ def required_json_field(model_class: type[BaseModel]):
 
 def optional_json_field(model_class: type[BaseModel]):
     return Field(None, sa_column=pydantic_json_column(model_class))
+
+
+def default_json_field(model_class: type[BaseModel], default_factory):
+    return Field(default_factory=default_factory, sa_column=pydantic_json_column(model_class))
