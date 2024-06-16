@@ -1,6 +1,8 @@
 """
 pytest fixtures for sqlmodel
 """
+import contextlib
+
 import pytest
 from sqlmodel import Session, SQLModel, StaticPool, create_engine
 
@@ -27,3 +29,4 @@ def session_fxt():
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         yield session
+

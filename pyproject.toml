@@ -19,13 +19,14 @@ ui = [
 sql = [
     'sqlmodel'
 ]
+dev = [
+    'pytest',
+    'pytest-asyncio',
+]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = false
-dev-dependencies = []
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -2,6 +2,9 @@ import sqlalchemy
 from pydantic import BaseModel
 from sqlmodel import Column, Field
 
+JSONTypes = str | list[str] | dict[str, str] | tuple[str, ...] | None
+JSONTypesPydantic = BaseModel | list[BaseModel] | dict[str | int, BaseModel] | tuple[BaseModel, ...] | None
+
 
 class PydanticJSONColumn(sqlalchemy.TypeDecorator):
     impl = sqlalchemy.JSON
@@ -10,7 +13,7 @@ class PydanticJSONColumn(sqlalchemy.TypeDecorator):
         super().__init__(*args, **kwargs)
         self.model_class = model_class
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value: JSONTypesPydantic, dialect) -> JSONTypes:
         if value is None:
             return None
         elif isinstance(value, list):
@@ -20,17 +23,22 @@ class PydanticJSONColumn(sqlalchemy.TypeDecorator):
                 key: item.model_dump_json(round_trip=True) if isinstance(item, BaseModel) else item
                 for key, item in value.items()
             }
+        elif isinstance(value, tuple):
+            return tuple(
+                item.model_dump_json(round_trip=True) if isinstance(item, BaseModel) else item for item in value
+            )
         elif isinstance(value, BaseModel):
             return value.model_dump_json(round_trip=True)
-        return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value: JSONTypes, dialect) -> JSONTypesPydantic:
         if value is None:
             return None
         elif isinstance(value, list):
             return [self.model_class.model_validate_json(item) for item in value]
         elif isinstance(value, dict):
             return {key: self.model_class.model_validate_json(item) for key, item in value.items()}
+        elif isinstance(value, tuple):
+            return tuple(self.model_class.model_validate_json(item) for item in value)
         return self.model_class.model_validate_json(value)
 
 
