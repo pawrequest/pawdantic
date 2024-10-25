@@ -1,4 +1,4 @@
-from datetime import date
+from typing import Callable
 
 import sqlalchemy
 from pydantic import BaseModel
@@ -59,5 +59,5 @@ def optional_json_field(model_class: type[BaseModel]):
     return Field(None, sa_column=pydantic_json_column(model_class))
 
 
-def default_json_field(model_class: type[BaseModel], default_factory):
+def default_json_field(model_class: type[BaseModel], default_factory: Callable[[], JSONTypesPydantic]):
     return Field(default_factory=default_factory, sa_column=pydantic_json_column(model_class))
