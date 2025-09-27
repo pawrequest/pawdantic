@@ -108,3 +108,23 @@ def str_length_const(length: int):
     return _t.Annotated[str,
     StringConstraints(strip_whitespace=True, max_length=length),
     ]
+
+
+ConvertMode = Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias']
+
+
+def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | BaseModel | str:
+    match mode:
+        case 'pydantic':
+            return obj
+        case 'python':
+            return obj.model_dump(mode='json', by_alias=False)
+        case 'python-alias':
+            return obj.model_dump(mode='json', by_alias=True)
+        case 'json':
+            return obj.model_dump_json(by_alias=False)
+        case 'json-alias':
+            return obj.model_dump_json(by_alias=True)
+        case _:
+            raise ValueError(f'Invalid ConvertMode: {mode}')
+
