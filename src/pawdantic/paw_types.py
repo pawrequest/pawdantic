@@ -6,6 +6,7 @@ import typing as _t
 import typing as _ty
 
 import pydantic as _p
+from pydantic import StringConstraints
 
 
 def identifiers_only(v):
@@ -47,23 +48,17 @@ def truncate_after(maxlength) -> _p.AfterValidator:
 
 
 def truncated_ident_str_type(max_length: int):
-    return _ty.Annotated[
-        IdentStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
+    return _ty.Annotated[IdentStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
 
 
 def optional_truncated_ident_str_type(max_length: int):
     return _ty.Annotated[
-        IdentStr, _p.StringConstraints(max_length=max_length), truncate_before(
-            max_length
-        ), _p.Field(
-            ''
-        )
+        IdentStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length), _p.Field('')
     ]
 
 
 def truncated_printable_str_type(max_length: int):
-    return _ty.Annotated[
-        PrintableStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
+    return _ty.Annotated[PrintableStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
 
 
 def optional_truncated_printable_str_type(max_length: int):
@@ -73,7 +68,7 @@ def optional_truncated_printable_str_type(max_length: int):
         truncate_before(max_length),
         _p.Field(
             default=None,
-        )
+        ),
     ]
 
 
@@ -101,15 +96,15 @@ VALID_POSTCODE = _t.Annotated[
 
 
 def multi_model_dump(*models: _p.BaseModel) -> dict[str, str]:
-    return {
-        k: v
-        for mod in list(models)
-        for k, v in mod.model_dump(exclude_none=True).items()
-    }
+    return {k: v for mod in list(models) for k, v in mod.model_dump(exclude_none=True).items()}
 
 
 def get_initial_f_dict(*dicts: dict):
     dicts = list(dicts)
-    return {
-        k: v for d in dicts for k, v in d.items()
-    }
+    return {k: v for d in dicts for k, v in d.items()}
+
+
+def str_length_const(length: int):
+    return _t.Annotated[str,
+    StringConstraints(strip_whitespace=True, max_length=length),
+    ]
