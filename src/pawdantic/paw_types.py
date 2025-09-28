@@ -110,7 +110,7 @@ def str_length_const(length: int):
     ]
 
 
-ConvertMode = Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias']
+ConvertMode = _t.Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias']
 
 
 def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | BaseModel | str:
@@ -128,3 +128,20 @@ def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | BaseModel | str
         case _:
             raise ValueError(f'Invalid ConvertMode: {mode}')
 
+
+def prep_phone(v: str) -> str:
+    if isinstance(v, str):
+        # logger.debug(f'Prepping phone: {v}')
+        v = v.replace(' ', '')
+        # try:
+        #     nummy = phonenumbers.parse(v, 'GB')
+        #     assert phonenumbers.is_valid_number(nummy)
+        #     v = phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.NATIONAL).replace(' ', '')
+        # except phonenumbers.phonenumberutil.NumberParseException:
+        #     logger.warning(f'Unable to parse phone number: {v}')
+        # except AssertionError:
+        #     logger.warning(f'Invalid phone number: {v}')
+    return v
+
+
+MyPhone = _t.Annotated[str, _p.BeforeValidator(prep_phone)]
