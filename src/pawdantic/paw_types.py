@@ -1,6 +1,7 @@
 # from __future__ import annotations
 from __future__ import annotations
 
+import base64
 import re
 import typing as _t
 import typing as _ty
@@ -75,24 +76,25 @@ def optional_truncated_printable_str_type(max_length: int):
 pc_excluded = {'C', 'I', 'K', 'M', 'O', 'V'}
 
 
+POSTCODE_PATTERN = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
+
+
 def validate_uk_postcode(v: str):
-    pattern = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
-    if not re.match(pattern, v) and not set(v[-2:]).intersection(pc_excluded):
+    if not re.match(POSTCODE_PATTERN, v) and not set(v[-2:]).intersection(pc_excluded):
         raise _p.ValidationError('Invalid UK postcode')
     return v
 
 
-def default_gen(typ, **kwargs):
-    return _t.Annotated[typ, _p.Field(**kwargs)]
-
-
-POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
 VALID_POSTCODE = _t.Annotated[
     str,
     _p.AfterValidator(validate_uk_postcode),
     _p.BeforeValidator(lambda s: s.strip().upper()),
     _p.Field(..., description='A valid UK postcode'),
 ]
+
+
+def is_valid_postcode(pc):
+    return bool(re.match(POSTCODE_PATTERN, pc.strip().upper()))
 
 
 def multi_model_dump(*models: _p.BaseModel) -> dict[str, str]:
@@ -105,8 +107,9 @@ def get_initial_f_dict(*dicts: dict):
 
 
 def str_length_const(length: int):
-    return _t.Annotated[str,
-    StringConstraints(strip_whitespace=True, max_length=length),
+    return _t.Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, max_length=length),
     ]
 
 
@@ -145,3 +148,10 @@ def prep_phone(v: str) -> str:
 
 
 MyPhone = _t.Annotated[str, _p.BeforeValidator(prep_phone)]
+
+
+def encode_b64_str(s: str) -> str:
+    return base64.b64encode(s.encode('utf8')).decode('utf8')
+
+
+
